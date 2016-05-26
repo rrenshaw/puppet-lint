@@ -168,6 +168,21 @@ describe 'variable_scope' do
       expect(problems).to contain_warning(msg).on_line(6).in_column(11)
     end
   end
+  
+  context 'future parser blocks with string index' do
+    let (:code) { "
+      class foo() {
+        $foo = {'one'=>2, 'two'=>3}
+        $foo.each |$a, $b| {
+          $a    # should cause no warnings
+          $c    # top-scope variable warning
+        }
+        $b      # top-scope variable warning
+        $foo.each |$d| {
+          $d['one'] # should cause no warnings
+        }
+      }
+    " }
 
   %w{alias audit before loglevel noop notify require schedule stage subscribe tag}.each do |metaparam|
     context "referencing #{metaparam} metaparam value as a variable" do
